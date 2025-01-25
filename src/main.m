@@ -52,7 +52,7 @@ int main(int argc, const char *argv[]) {
         // Get current HTTP handler
         NSString *current_handler_name = get_current_http_handler();
 
-        if (target == '\0') {
+        if (target == nil) {
             // List all HTTP handlers, marking the current one with a star
             for (NSString *key in handlers) {
                 char *mark = [key caseInsensitiveCompare:current_handler_name] == NSOrderedSame ? "* " : "  ";
