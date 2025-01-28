@@ -7,7 +7,19 @@
 #import <ApplicationServices/ApplicationServices.h>
 
 NSString* app_name_from_bundle_id(NSString *app_bundle_id) {
-    return [[[app_bundle_id componentsSeparatedByString:@"."] lastObject] lowercaseString];
+
+    NSString *handler = app_bundle_id;
+    NSString *shortname = @"";
+
+    if ([handler caseInsensitiveCompare:@"company.thebrowser.Browser"] == NSOrderedSame) {
+        shortname = @"arc";
+    } else if ([handler caseInsensitiveCompare:@"com.brave.Browser"] == NSOrderedSame) {
+        shortname = @"brave";
+    } else {
+        shortname = [[[app_bundle_id componentsSeparatedByString:@"."] lastObject] lowercaseString];
+    }
+
+    return shortname;
 }
 
 NSMutableDictionary* get_http_handlers() {
@@ -20,7 +32,10 @@ NSMutableDictionary* get_http_handlers() {
 
     for (int i = 0; i < [handlers count]; i++) {
         NSString *handler = [handlers objectAtIndex:i];
-        dict[app_name_from_bundle_id(handler)] = handler;
+
+        NSString *shortname = app_name_from_bundle_id(handler);
+
+        dict[shortname] = handler;
     }
 
     return dict;
@@ -57,36 +72,21 @@ int main(int argc, const char *argv[]) {
             for (NSString *key in handlers) {
                 NSString *value = handlers[key];
                 char *mark = [key caseInsensitiveCompare:current_handler_name] == NSOrderedSame ? "* " : "  ";
-
-                if ([key caseInsensitiveCompare:@"browser"] == NSOrderedSame) {
-                    key = @"arc";
-                }
                 printf("%s%s\n", mark, [key UTF8String]);
             }
         } else {
-            NSString *display_name = [target copy];
-            NSString *lookup_name = [target copy];
 
-            // Convert arc/browser names for display and lookup
-            if ([target caseInsensitiveCompare:@"browser"] == NSOrderedSame) {
-                display_name = @"arc";
-                lookup_name = @"browser";
-            } else if ([target caseInsensitiveCompare:@"arc"] == NSOrderedSame) {
-                display_name = @"arc";
-                lookup_name = @"browser";
-            }
-
-            if ([lookup_name caseInsensitiveCompare:current_handler_name] == NSOrderedSame) {
-                printf("%s is already set as the default HTTP handler\n", [display_name UTF8String]);
+            if ([target caseInsensitiveCompare:current_handler_name] == NSOrderedSame) {
+                printf("%s is already set as the default HTTP handler\n", [target UTF8String]);
             } else {
-                NSString *target_handler = handlers[lookup_name];
+                NSString *target_handler = handlers[target];
 
                 if (target_handler != nil) {
                     // Set new HTTP handler (HTTP and HTTPS separately)
                     set_default_handler(@"http", target_handler);
                     set_default_handler(@"https", target_handler);
                 } else {
-                    printf("%s is not available as an HTTP handler\n", [display_name UTF8String]);
+                    printf("%s is not available as an HTTP handler\n", [target UTF8String]);
 
                     return 1;
                 }
