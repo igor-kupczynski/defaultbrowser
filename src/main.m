@@ -70,7 +70,6 @@ int main(int argc, const char *argv[]) {
         if (target == '\0') {
             // List all HTTP handlers, marking the current one with a star
             for (NSString *key in handlers) {
-                NSString *value = handlers[key];
                 char *mark = [key caseInsensitiveCompare:current_handler_name] == NSOrderedSame ? "* " : "  ";
                 printf("%s%s\n", mark, [key UTF8String]);
             }
