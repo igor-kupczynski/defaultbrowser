@@ -58,7 +58,7 @@ void set_default_handler(NSString *url_scheme, NSString *handler) {
 }
 
 int main(int argc, const char *argv[]) {
-    NSString *target = (argc > 1) ? [NSString stringWithUTF8String:argv[1]] : nil;
+    const char *target = (argc == 1) ? '\0' : argv[1];
 
     @autoreleasepool {
         // Get all HTTP handlers
