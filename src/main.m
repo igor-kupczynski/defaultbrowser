@@ -58,7 +58,7 @@ void set_default_handler(NSString *url_scheme, NSString *handler) {
 }
 
 int main(int argc, const char *argv[]) {
-    const char *target = (argc == 1) ? '\0' : argv[1];
+    NSString *target = (argc > 1) ? [NSString stringWithUTF8String:argv[1]] : nil;
 
     @autoreleasepool {
         // Get all HTTP handlers
@@ -67,16 +67,17 @@ int main(int argc, const char *argv[]) {
         // Get current HTTP handler
         NSString *current_handler_name = get_current_http_handler();
 
-        if (target == '\0') {
+        if (target == nil) {
             // List all HTTP handlers, marking the current one with a star
             for (NSString *key in handlers) {
                 char *mark = [key caseInsensitiveCompare:current_handler_name] == NSOrderedSame ? "* " : "  ";
                 printf("%s%s\n", mark, [key UTF8String]);
             }
         } else {
+            NSString *target_handler_name = target;
 
-            if ([target caseInsensitiveCompare:current_handler_name] == NSOrderedSame) {
-                printf("%s is already set as the default HTTP handler\n", [target UTF8String]);
+            if ([target_handler_name caseInsensitiveCompare:current_handler_name] == NSOrderedSame) {
+              printf("%s is already set as the default HTTP handler\n", [target UTF8String]);
             } else {
                 NSString *target_handler = handlers[target];
 
