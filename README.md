@@ -32,7 +32,7 @@ Running `defaultbrowser` without arguments lists available HTTP handlers and sho
 How does it work?
 -----------------
 
-The code uses the [macOS Launch Services API](https://developer.apple.com/documentation/coreservices/launch_services).
+The tool uses a combination of the [macOS Launch Services API](https://developer.apple.com/documentation/coreservices/launch_services) (for setting the default handler) and [AppKit's NSWorkspace APIs](https://developer.apple.com/documentation/appkit/nsworkspace) (for querying available and current browser handlers). This ensures compatibility with modern macOS versions and avoids deprecated APIs.
 
 Additional Resources
 --------------------

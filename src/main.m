@@ -5,6 +5,7 @@
 
 #import <Foundation/Foundation.h>
 #import <ApplicationServices/ApplicationServices.h>
+#import <AppKit/AppKit.h>
 
 NSString* app_name_from_bundle_id(NSString *app_bundle_id) {
 
@@ -23,31 +24,31 @@ NSString* app_name_from_bundle_id(NSString *app_bundle_id) {
 }
 
 NSMutableDictionary* get_http_handlers() {
-    NSArray *handlers =
-      (__bridge NSArray *) LSCopyAllHandlersForURLScheme(
-        (__bridge CFStringRef) @"http"
-      );
-
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSURL *httpURL = [NSURL URLWithString:@"http://example.com"];
+    NSArray<NSURL *> *appURLs = [[NSWorkspace sharedWorkspace] URLsForApplicationsToOpenURL:httpURL];
 
-    for (int i = 0; i < [handlers count]; i++) {
-        NSString *handler = [handlers objectAtIndex:i];
-
-        NSString *shortname = app_name_from_bundle_id(handler);
-
-        dict[shortname] = handler;
+    for (NSURL *appURL in appURLs) {
+        NSString *bundleID = [[NSBundle bundleWithURL:appURL] bundleIdentifier];
+        if (bundleID) {
+            NSString *shortname = app_name_from_bundle_id(bundleID);
+            dict[shortname] = bundleID;
+        }
     }
-
     return dict;
 }
 
 NSString* get_current_http_handler() {
-    NSString *handler =
-        (__bridge NSString *) LSCopyDefaultHandlerForURLScheme(
-            (__bridge CFStringRef) @"http"
-        );
-
-    return app_name_from_bundle_id(handler);
+    NSURL *httpURL = [NSURL URLWithString:@"http://example.com"];
+    NSURL *appURL = [[NSWorkspace sharedWorkspace] URLForApplicationToOpenURL:httpURL];
+    NSString *bundleID = nil;
+    if (appURL) {
+        bundleID = [[NSBundle bundleWithURL:appURL] bundleIdentifier];
+    }
+    if (!bundleID) {
+        return @"unknown";
+    }
+    return app_name_from_bundle_id(bundleID);
 }
 
 void set_default_handler(NSString *url_scheme, NSString *handler) {
