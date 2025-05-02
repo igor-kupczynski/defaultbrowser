@@ -6,11 +6,13 @@ Command line tool for setting the default browser (HTTP handler) in macOS X.
 Install
 -------
 
-Build it:
+Build it (universal binary for both Apple Silicon (arm64) and Intel (x86_64) Macs):
 
 ```
 make
 ```
+
+This will compile the code for both architectures and create a single universal binary named `defaultbrowser` using `lipo`.
 
 Install it into your executable path:
 
